@@ -86,9 +86,11 @@ def calculate_uptime_downtime(store_polls, business_hours, store_timezones, curr
 
         for period in intervals:
             active_intervals = data[f"active_last_{period}"]
-            total_intervals = intervals[period]
-            uptime_duration = int(active_intervals / total_intervals * 100)
-            downtime_duration = 100 - uptime_duration
+            inactive_intervals = data[f"inactive_last_{period}"]
+            total_intervals = active_intervals + inactive_intervals
+
+            uptime_duration = int(active_intervals / total_intervals * 100) if total_intervals > 0 else 0
+            downtime_duration = int(inactive_intervals / total_intervals * 100) if total_intervals > 0 else 0
             row.extend([uptime_duration, downtime_duration])
 
         report_data.append(row)
