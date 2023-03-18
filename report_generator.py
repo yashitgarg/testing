@@ -81,102 +81,14 @@ def calculate_uptime_downtime(store_polls, business_hours, store_timezones, curr
     # Calculate uptime and downtime durations
     report_data = []
     for store_id, data in store_data.items():
-        intervals = {'hour': 1, 'day': 24, 'week': 168}
+        intervals = {'hour': 60, 'day': 1440, 'week': 10080}
         row = [store_id]
 
         for period in intervals:
             active_intervals = data[f"active_last_{period}"]
             total_intervals = intervals[period]
-            uptime_duration = int(active_intervals / total_intervals) * 60
-            downtime_duration = 60 - uptime_duration
-            row.extend([uptime_duration, downtime_duration])
-
-        report_data.append(row)
-
-    return report_data
-
-    # Create time range limits
-    one_hour_ago = current_time - timedelta(hours=1)
-    one_day_ago = current_time - timedelta(days=1)
-    one_week_ago = current_time - timedelta(weeks=1)
-
-    # Initialize store data
-    store_data = defaultdict(lambda: defaultdict(int))
-
-    # Create a dictionary to store timezones for each store
-    store_timezones_dict = {store_id: timezone_str for store_id, timezone_str in store_timezones}
-
-    # Process store_polls
-    for store_poll in store_polls:
-        store_id = store_poll['store_id']
-        status = store_poll['status']
-        timestamp_utc = store_poll['timestamp_utc']
-        timestamp = datetime.strptime(timestamp_utc, '%Y-%m-%d %H:%M:%S.%f %Z').replace(tzinfo=timezone.utc)
-        local_tz = pytz.timezone(store_timezones_dict.get(store_id, 'America/Chicago'))
-        local_time = timestamp.astimezone(local_tz)
-
-        if one_hour_ago <= timestamp:
-            store_data[store_id][f"{status}_last_hour"] += 1
-        if one_day_ago <= timestamp:
-            store_data[store_id][f"{status}_last_day"] += 1
-        if one_week_ago <= timestamp:
-            store_data[store_id][f"{status}_last_week"] += 1
-
-    # Calculate uptime and downtime durations
-    report_data = []
-    for store_id, data in store_data.items():
-        intervals = {'hour': 1, 'day': 24, 'week': 168}
-        row = [store_id]
-
-        for period in intervals:
-            active_intervals = data[f"active_last_{period}"]
-            total_intervals = intervals[period]
-            uptime_duration = int(active_intervals / total_intervals) * 60
-            downtime_duration = 60 - uptime_duration
-            row.extend([uptime_duration, downtime_duration])
-
-        report_data.append(row)
-
-    return report_data
-
-    # Create time range limits
-    one_hour_ago = current_time - timedelta(hours=1)
-    one_day_ago = current_time - timedelta(days=1)
-    one_week_ago = current_time - timedelta(weeks=1)
-
-    # Initialize store data
-    store_data = defaultdict(lambda: defaultdict(int))
-
-    # Create a dictionary to store timezones for each store
-    store_timezones_dict = {store_id: timezone_str for store_id, timezone_str in store_timezones}
-
-    # Process store_polls
-    for store_poll in store_polls:
-        store_id = store_poll['store_id']
-        status = store_poll['status']
-        timestamp_utc = store_poll['timestamp_utc']
-        timestamp = datetime.strptime(timestamp_utc, '%Y-%m-%d %H:%M:%S.%f %Z')
-        local_tz = pytz.timezone(store_timezones_dict.get(store_id, 'America/Chicago'))
-        local_time = timestamp.replace(tzinfo=pytz.utc).astimezone(local_tz)
-
-        if one_hour_ago <= timestamp:
-            store_data[store_id][f"{status}_last_hour"] += 1
-        if one_day_ago <= timestamp:
-            store_data[store_id][f"{status}_last_day"] += 1
-        if one_week_ago <= timestamp:
-            store_data[store_id][f"{status}_last_week"] += 1
-
-    # Calculate uptime and downtime durations
-    report_data = []
-    for store_id, data in store_data.items():
-        intervals = {'hour': 1, 'day': 24, 'week': 168}
-        row = [store_id]
-
-        for period in intervals:
-            active_intervals = data[f"active_last_{period}"]
-            total_intervals = intervals[period]
-            uptime_duration = int(active_intervals / total_intervals) * 60
-            downtime_duration = 60 - uptime_duration
+            uptime_duration = int(active_intervals / total_intervals * 100)
+            downtime_duration = 100 - uptime_duration
             row.extend([uptime_duration, downtime_duration])
 
         report_data.append(row)
